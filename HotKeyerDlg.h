@@ -42,6 +42,7 @@ public:
   afx_msg void OnTimer(UINT_PTR nIDEvent);
 //  afx_msg void OnAfxIdPreviewClose();
   afx_msg void OnHotkeyerExit();
+  void doKey(CString & data);
   afx_msg void OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2);
   afx_msg void OnSize(UINT nType, int cx, int cy);
 //  afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);

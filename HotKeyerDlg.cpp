@@ -167,6 +167,25 @@ void CHotKeyerDlg::OnHotkeyerExit()
 }
 
 //---------------------------------------------------------------------------------------
+void CHotKeyerDlg::doKey(CString &data)
+{
+  INPUT ip;
+
+  int scancode = 0;
+  StrToIntExA(data, STIF_SUPPORT_HEX, &scancode);
+
+  memset(&ip, 0, sizeof(INPUT));
+  ip.type = INPUT_KEYBOARD;
+  ip.ki.dwFlags = KEYEVENTF_SCANCODE;
+  ip.ki.wScan = scancode;
+
+  SendInput(1, &ip, sizeof(INPUT));
+
+  ip.ki.dwFlags |= KEYEVENTF_KEYUP;
+  SendInput(1, &ip, sizeof(INPUT));
+}
+
+//---------------------------------------------------------------------------------------
 void CHotKeyerDlg::doCMD(CString &data)
 {
   CString txt;
@@ -231,10 +250,13 @@ void CHotKeyerDlg::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
     i++;
     if (i == nHotKeyId)
     {
-      m_TrayIcon.ShowBalloon("Executing hotkey");
-
-      KillTimer(timer);
-      timer = SetTimer(0, 2000, NULL);
+      if(timer)
+      { 
+        KillTimer(timer);
+        timer = 0;
+        m_TrayIcon.HideBalloon();
+        Sleep(200);
+      }
 
       int i = data.Find(':');
       if (i > -1)
@@ -245,6 +267,14 @@ void CHotKeyerDlg::OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2)
 
       if (cmd == "cmd")
         doCMD(data);
+
+      if (cmd == "key")
+        doKey(data);
+
+      Sleep(100); // we don`t want the ballon in the screenshot
+
+      m_TrayIcon.ShowBalloon("Executed hotkey");
+      timer = SetTimer(0, 2000, NULL);
 
       break;
     }
